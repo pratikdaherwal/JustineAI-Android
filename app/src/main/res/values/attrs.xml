@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="gradientBackground" format="reference" />
+    <attr name="editTextBackground" format="reference" />
+    <attr name="strokeColor" format="reference" />
+    <attr name="splashColor" format="reference" />
+</resources>

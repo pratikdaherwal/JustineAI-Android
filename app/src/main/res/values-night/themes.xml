@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.JustineAI" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="gradientBackground">@drawable/background_gradient_dark</item>
+        <item name="editTextBackground">@color/black</item>
+        <item name="strokeColor">@color/white</item>
+        <item name="splashColor">@color/white</item>
+    </style>
+</resources>

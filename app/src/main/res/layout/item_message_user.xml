@@ -1,0 +1,18 @@
+<com.google.android.flexbox.FlexboxLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="8dp"
+    app:flexDirection="row_reverse">
+
+    <TextView
+        android:id="@+id/messageText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="80pt"
+        android:padding="16dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/bubble_user_background"
+        android:textAppearance="?attr/textAppearanceBodyMedium"/>
+</com.google.android.flexbox.FlexboxLayout>
