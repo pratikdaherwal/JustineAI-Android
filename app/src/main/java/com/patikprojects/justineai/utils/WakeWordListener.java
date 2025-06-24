@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.patikprojects.justineai.activity.AssistantOverlayActivity;
 import com.patikprojects.justineai.assist.JustineAssistantActivity;
 
 import java.util.List;

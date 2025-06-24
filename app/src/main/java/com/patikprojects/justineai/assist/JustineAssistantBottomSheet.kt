@@ -1,6 +1,7 @@
 package com.patikprojects.justineai.assist
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -14,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
-import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.patikprojects.justineai.R
 
@@ -37,7 +37,7 @@ class JustineAssistantBottomSheet : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupSpeechRecognition()
         startListening()
-        view.setOnClickListener { dismiss() } // Tap anywhere to dismiss
+        view.setOnClickListener { dismiss() }
     }
 
     private fun setupSpeechRecognition() {
@@ -56,25 +56,30 @@ class JustineAssistantBottomSheet : BottomSheetDialogFragment() {
         }
 
         speechRecognizer?.setRecognitionListener(object : RecognitionListener {
+            @SuppressLint("SetTextI18n")
             override fun onReadyForSpeech(params: Bundle?) {
                 statusText.text = "Listening..."
             }
 
+            @SuppressLint("SetTextI18n")
             override fun onBeginningOfSpeech() {
                 statusText.text = "Speak now..."
             }
 
             override fun onRmsChanged(rmsdB: Float) {}
             override fun onBufferReceived(buffer: ByteArray?) {}
+            @SuppressLint("SetTextI18n")
             override fun onEndOfSpeech() {
                 statusText.text = "Processing..."
             }
 
+            @SuppressLint("SetTextI18n")
             override fun onError(error: Int) {
                 statusText.text = "Error: $error"
                 Handler(Looper.getMainLooper()).postDelayed({ dismiss() }, 2000)
             }
 
+            @SuppressLint("SetTextI18n")
             override fun onResults(results: Bundle?) {
                 val result = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
                 resultText.text = result ?: ""

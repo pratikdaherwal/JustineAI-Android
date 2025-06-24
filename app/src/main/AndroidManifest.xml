@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -10,6 +9,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+<!--    <uses-permission android:name="android.permission.BIND_VOICE_INTERACTION" />-->
 
     <application
         android:allowBackup="true"
@@ -20,7 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.JustineAI"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true" >
 
         <meta-data
             android:name="android.voice_interaction"
@@ -28,16 +28,14 @@
 
         <activity
             android:name=".activity.AssistantOverlayActivity"
-            android:theme="@style/Theme.JustineAI.Transparent"
             android:excludeFromRecents="true"
+            android:exported="true"
             android:launchMode="singleInstance"
             android:taskAffinity=""
-            android:exported="true" />
-
-
+            android:theme="@style/Theme.JustineAI.Transparent" />
         <activity
             android:name=".activity.SplashScreen"
-            android:exported="true">
+            android:exported="true" >
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
@@ -48,7 +46,7 @@
         </activity>
         <activity
             android:name=".activity.SpeechHomeActivity"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -59,16 +57,16 @@
             android:name=".activity.TextHomeActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
             android:name=".assist.JustineAssistantActivity"
-            android:theme="@style/Theme.JustineAI.Transparent"
             android:excludeFromRecents="true"
+            android:exported="true"
             android:launchMode="singleTop"
             android:noHistory="true"
-            android:exported="true">
+            android:theme="@style/Theme.JustineAI.Transparent" >
             <intent-filter>
                 <action android:name="android.intent.action.ASSIST" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -80,23 +78,9 @@
             android:foregroundServiceType="microphone" />
 
         <service
-            android:name=".assist.JustineVoiceService"
-            android:permission="android.permission.BIND_VOICE_INTERACTION"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.service.voice.VoiceInteractionService" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <meta-data
-                android:name="android.voice_interaction"
-                android:resource="@xml/justine_voice_interaction" />
-        </service>
-
-        <service
             android:name=".assist.JustineSessionService"
-            android:permission="android.permission.BIND_VOICE_INTERACTION"
-            android:exported="false" />
-
+            android:exported="false"
+            android:permission="android.permission.BIND_VOICE_INTERACTION" />
     </application>
 
 </manifest>
