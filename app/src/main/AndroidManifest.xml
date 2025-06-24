@@ -60,6 +60,19 @@
             android:exported="true"
             android:windowSoftInputMode="adjustPan" />
 
+        <activity
+            android:name=".assist.JustineAssistantActivity"
+            android:theme="@style/Theme.JustineAI.Transparent"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:noHistory="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".service.WakeWordService"
             android:enabled="true"

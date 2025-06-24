@@ -1,6 +1,7 @@
 package com.patikprojects.justineai.activity
 
 import android.annotation.SuppressLint
+import android.app.role.RoleManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -87,6 +88,7 @@ class SpeechHomeActivity : AppCompatActivity() {
             setupSpeechRecognition()
             ensureWakeWordServiceRunning()
             registerReceivers()
+            checkAndPromptDefaultAssistant()
         }
     }
 
@@ -245,6 +247,17 @@ class SpeechHomeActivity : AppCompatActivity() {
         unregisterReceiver(recognitionReceiver)
         Log.i(TAG, "Activity destroyed")
     }
+
+    private fun checkAndPromptDefaultAssistant() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val roleManager = getSystemService(RoleManager::class.java)
+            if (!roleManager.isRoleHeld(RoleManager.ROLE_ASSISTANT)) {
+                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT)
+                startActivityForResult(intent, 1234) // 1234 is your REQUEST_CODE_SET_ASSISTANT
+            }
+        }
+    }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

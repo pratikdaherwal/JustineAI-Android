@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.patikprojects.justineai.activity.AssistantOverlayActivity;
+import com.patikprojects.justineai.assist.JustineAssistantActivity;
 
 import java.util.List;
 import java.util.Objects;
@@ -80,7 +81,8 @@ public class WakeWordListener {
         } else {
             Log.i(TAG, "App in background, triggering overlay via accessibility");
 
-            Intent floatingIntent = new Intent(context, AssistantOverlayActivity.class);
+            Intent floatingIntent = new Intent(context, JustineAssistantActivity.class);
+            floatingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(floatingIntent);
         }
     }
