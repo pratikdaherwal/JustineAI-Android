@@ -28,8 +28,7 @@ class JustineAssistantBottomSheet : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_justine_assistant, container, false)
-        statusText = view.findViewById(R.id.status_text)
-        resultText = view.findViewById(R.id.result_text)
+//        resultText = view.findViewById(R.id.result_text)
         return view
     }
 

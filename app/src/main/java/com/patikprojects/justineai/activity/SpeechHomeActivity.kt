@@ -1,19 +1,15 @@
 package com.patikprojects.justineai.activity
 
 import android.annotation.SuppressLint
-import android.app.role.RoleManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.graphics.RenderEffect
-import android.graphics.Shader
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.preference.Preference
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -26,12 +22,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.patikprojects.justineai.R
-import com.patikprojects.justineai.utils.WakeWordListener
 import com.patikprojects.justineai.service.WakeWordService
-import com.patikprojects.justineai.utils.AssistantUtils
 import com.patikprojects.justineai.utils.MyGLSurfaceView
 import com.patikprojects.justineai.utils.PermissionManager
 import com.patikprojects.justineai.utils.SphereRenderer
+import com.patikprojects.justineai.utils.WakeWordListener
 
 class SpeechHomeActivity : AppCompatActivity() {
     private lateinit var glView: MyGLSurfaceView
@@ -69,7 +64,7 @@ class SpeechHomeActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_speech_home)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.container)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -78,20 +73,31 @@ class SpeechHomeActivity : AppCompatActivity() {
         initializeViews()
         checkPermissionsAndInitialize()
 
-        findViewById<TextView>(R.id.change_assistant).setOnClickListener {
+        findViewById<ImageView>(R.id.change_assistant).setOnClickListener {
             PermissionManager.promptToSetDefaultAssistant(this)
         }
 
-        findViewById<TextView>(R.id.change_assistant).setOnClickListener {
-            val roleManager = getSystemService(RoleManager::class.java)
-            if (roleManager != null && !roleManager.isRoleHeld(RoleManager.ROLE_ASSISTANT)) {
-                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT)
-                startActivityForResult(intent, 1234)
-            } else {
-                val intent = Intent(android.provider.Settings.ACTION_VOICE_INPUT_SETTINGS)
-                startActivity(intent)
-            }
+//        findViewById<TextView>(R.id.change_assistant).setOnClickListener {
+//            val roleManager = getSystemService(RoleManager::class.java)
+//            if (roleManager != null && !roleManager.isRoleHeld(RoleManager.ROLE_ASSISTANT)) {
+//                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT)
+//                startActivityForResult(intent, 1234)
+//            } else {
+//                val intent = Intent(android.provider.Settings.ACTION_VOICE_INPUT_SETTINGS)
+//                startActivity(intent)
+//            }
+//        }
+
+        val triggeredByWakeWord = intent.getBooleanExtra("triggered_by_wake_word", false)
+        if (triggeredByWakeWord) {
+            Log.i(TAG, "Started by wake word - auto triggering recognition")
+            Handler(Looper.getMainLooper()).postDelayed({
+                sphereRenderer.animate = true
+                WakeWordListener.stop()
+                speechRecognizer.startListening(speechIntent)
+            }, 300)
         }
+
 
         Log.i(TAG, "SpeechHomeActivity created")
     }
@@ -118,16 +124,16 @@ class SpeechHomeActivity : AppCompatActivity() {
         glView.setEGLContextClientVersion(1)
         glView.setRenderer(sphereRenderer)
 
-        val backgroundImage: ImageView = findViewById(R.id.background_image)
-        backgroundImage.setRenderEffect(
-            RenderEffect.createBlurEffect(100f, 100f, Shader.TileMode.MIRROR)
-        )
+//        val backgroundImage: ImageView = findViewById(R.id.background_image)
+//        backgroundImage.setRenderEffect(
+//            RenderEffect.createBlurEffect(100f, 100f, Shader.TileMode.MIRROR)
+//        )
 
         glView.setOnClickListener {
             toggleSpeechRecognition()
         }
 
-        findViewById<TextView>(R.id.use_keyboard).setOnClickListener {
+        findViewById<ImageView>(R.id.use_keyboard).setOnClickListener {
             startActivity(Intent(this, TextHomeActivity::class.java))
         }
     }
@@ -242,7 +248,7 @@ class SpeechHomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         glView.onResume()
-        updateAssistantStatus()
+//        updateAssistantStatus()
         if (!sphereRenderer.animate && !WakeWordListener.isRunning()) {
             WakeWordListener.start(applicationContext)
         }
@@ -251,37 +257,38 @@ class SpeechHomeActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        startWakeWordService()
         speechRecognizer.destroy()
         unregisterReceiver(recognitionReceiver)
         Log.i(TAG, "Activity destroyed")
     }
 
-    private fun isJustineDefaultAssistant(): Boolean {
-        val context = this
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val roleManager = context.getSystemService(RoleManager::class.java)
-            roleManager?.isRoleHeld(RoleManager.ROLE_ASSISTANT) == true &&
-                    getDefaultAssistantPackage(context) == context.packageName
-        } else {
-            getDefaultAssistantPackage(context) == context.packageName
-        }
-    }
+//    private fun isJustineDefaultAssistant(): Boolean {
+//        val context = this
+//        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            val roleManager = context.getSystemService(RoleManager::class.java)
+//            roleManager?.isRoleHeld(RoleManager.ROLE_ASSISTANT) == true &&
+//                    getDefaultAssistantPackage(context) == context.packageName
+//        } else {
+//            getDefaultAssistantPackage(context) == context.packageName
+//        }
+//    }
 
-    private fun getDefaultAssistantPackage(context: Context): String? {
-        val intent = Intent(Intent.ACTION_ASSIST)
-        val resolveInfo = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-        return resolveInfo?.activityInfo?.packageName
-    }
+//    private fun getDefaultAssistantPackage(context: Context): String? {
+//        val intent = Intent(Intent.ACTION_ASSIST)
+//        val resolveInfo = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+//        return resolveInfo?.activityInfo?.packageName
+//    }
 
-    private fun updateAssistantStatus() {
-        val assistantStatusView = findViewById<TextView>(R.id.assistant_status)
-        val isDefault = isJustineDefaultAssistant()
-        assistantStatusView.text = if (isDefault) {
-            "JustineAI is your default assistant"
-        } else {
-            "None"
-        }
-    }
+//    private fun updateAssistantStatus() {
+//        val assistantStatusView = findViewById<TextView>(R.id.assistant_status)
+//        val isDefault = isJustineDefaultAssistant()
+//        assistantStatusView.text = if (isDefault) {
+//            "JustineAI is your default assistant"
+//        } else {
+//            "None"
+//        }
+//    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -295,10 +302,25 @@ class SpeechHomeActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1234) {
-            updateAssistantStatus()
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (requestCode == 1234) {
+//            updateAssistantStatus()
+//        }
+//    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val triggeredByWakeWord = intent.getBooleanExtra("triggered_by_wake_word", false)
+        if (triggeredByWakeWord) {
+            Log.i(TAG, "Received new intent from wake word - triggering recognition")
+            Handler(Looper.getMainLooper()).postDelayed({
+                sphereRenderer.animate = true
+                WakeWordListener.stop()
+                speechRecognizer.startListening(speechIntent)
+            }, 300)
         }
     }
+
 }

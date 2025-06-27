@@ -27,7 +27,7 @@ public class SphereRenderer implements GLSurfaceView.Renderer {
         gl.glEnable(GL10.GL_DEPTH_TEST);
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
         gl.glEnable(GL10.GL_POINT_SMOOTH);
-        gl.glPointSize(6f);
+        gl.glPointSize(3f);
     }
 
     @Override

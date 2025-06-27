@@ -40,7 +40,7 @@ object PermissionManager {
         } else {
             Log.i(TAG, "Audio permission granted")
 
-            promptToSetDefaultAssistant(activity)
+//            promptToSetDefaultAssistant(activity)
 
             onPermissionsGranted()
         }
@@ -96,7 +96,7 @@ object PermissionManager {
             .setMessage(message)
             .setPositiveButton("Settings") { _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = android.net.Uri.fromParts("package", activity.packageName, null)
+                    data = Uri.fromParts("package", activity.packageName, null)
                 }
                 activity.startActivity(intent)
             }

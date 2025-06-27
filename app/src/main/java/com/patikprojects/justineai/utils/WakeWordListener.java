@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.patikprojects.justineai.activity.SpeechHomeActivity;
 import com.patikprojects.justineai.assist.JustineAssistantActivity;
 
 import java.util.List;
 import java.util.Objects;
 
+import ai.picovoice.porcupine.Porcupine;
 import ai.picovoice.porcupine.PorcupineException;
 import ai.picovoice.porcupine.PorcupineManager;
 
@@ -29,7 +31,7 @@ public class WakeWordListener {
             porcupineManager = new PorcupineManager.Builder()
                     .setAccessKey("PNfRVdp1FCBn4CABSlXY8e4LnyAZbhpp1ab7zZcWv6JdBa2OTMkLFw==")
                     .setKeywordPath("keywords/hey-justine.ppn")
-                    .setSensitivity(0.7f)
+                    .setSensitivity(0.87f)
                     .build(context, keywordIndex -> {
                         Log.i(TAG, "Hotword Detected: Hey Justine");
                         handleWakeWordDetection(context);
@@ -67,9 +69,8 @@ public class WakeWordListener {
         String currentActivity = getCurrentActivity(context);
         boolean appInForeground = isAppInForeground(context);
 
-        Log.i(TAG, "App in foreground: " + appInForeground + ", Current activity: " + currentActivity);
-
         if (appInForeground) {
+            Log.i(TAG, "App in foreground, Current activity: " + currentActivity);
             if (currentActivity != null && currentActivity.contains("SpeechHomeActivity")) {
                 Log.i(TAG, "Triggering speech recognition in SpeechHomeActivity");
                 Intent intent = new Intent("START_RECOGNITION");
@@ -78,10 +79,15 @@ public class WakeWordListener {
                 Log.i(TAG, "App in foreground but not in SpeechHomeActivity, ignoring wake word");
             }
         } else {
-            Log.i(TAG, "App in background, triggering overlay via accessibility");
+            Log.i(TAG, "App in background, triggering screen");
 
-            Intent floatingIntent = new Intent(context, JustineAssistantActivity.class);
-            floatingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Intent floatingIntent = new Intent(context, SpeechHomeActivity.class);
+            floatingIntent.addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK |
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP
+            );
+            floatingIntent.putExtra("triggered_by_wake_word", true);
             context.startActivity(floatingIntent);
         }
     }
